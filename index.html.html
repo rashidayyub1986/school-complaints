@@ -1,0 +1,2088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SchoolComplaint Pro | Parent Complaint Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <style>
+        /* CSS Variables for Theme */
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a0ca3;
+            --primary-light: #4895ef;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #f94144;
+            --info: #2ec4b6;
+            --light: #f8f9fa;
+            --dark: #1a1a2e;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-400: #ced4da;
+            --gray-500: #adb5bd;
+            --gray-600: #6c757d;
+            --gray-700: #495057;
+            --gray-800: #343a40;
+            --gray-900: #212529;
+            
+            --card-bg: #ffffff;
+            --sidebar-bg: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            --header-bg: #ffffff;
+            --body-bg: #f8fafc;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 40px rgba(0,0,0,0.15);
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --sidebar-width: 280px;
+            --sidebar-collapsed: 80px;
+        }
+
+        [data-theme="dark"] {
+            --primary: #7209b7;
+            --primary-dark: #560bad;
+            --primary-light: #b5179e;
+            --secondary: #3a0ca3;
+            --card-bg: #1e293b;
+            --sidebar-bg: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            --header-bg: #1e293b;
+            --body-bg: #0f172a;
+            --light: #334155;
+            --dark: #f1f5f9;
+            --gray-100: #1e293b;
+            --gray-200: #334155;
+            --gray-300: #475569;
+            --shadow: 0 4px 6px rgba(0,0,0,0.3);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.4);
+        }
+
+        /* Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--body-bg);
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: var(--transition);
+        }
+
+        /* Layout */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            position: fixed;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .sidebar.collapsed .logo-text {
+            display: none;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 1.5rem 1rem;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            list-style: none;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.875rem 1rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            color: white;
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+        }
+
+        .nav-icon {
+            font-size: 1.25rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar.collapsed .nav-text {
+            display: none;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: var(--transition);
+        }
+
+        .sidebar.collapsed ~ .main-content {
+            margin-left: var(--sidebar-collapsed);
+        }
+
+        /* Header */
+        .header {
+            background: var(--header-bg);
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .header-left p {
+            color: var(--gray-600);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Action Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #38b2ac);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning), #f97316);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        /* Action Icons */
+        .action-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--light);
+            color: var(--dark);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .action-icon:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            padding: 2rem;
+        }
+
+        /* Stat Cards */
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-1 .stat-icon { background: linear-gradient(135deg, #e3f2fd, #bbdefb); color: var(--primary); }
+        .stat-2 .stat-icon { background: linear-gradient(135deg, #f3e5f5, #e1bee7); color: var(--secondary); }
+        .stat-3 .stat-icon { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); color: var(--success); }
+        .stat-4 .stat-icon { background: linear-gradient(135deg, #fff3e0, #ffcc80); color: var(--warning); }
+
+        .stat-content h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-content p {
+            color: var(--gray-600);
+            font-size: 0.875rem;
+        }
+
+        /* Charts Container */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            padding: 0 2rem 2rem;
+        }
+
+        /* Table Styles */
+        .table-container {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background: var(--light);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .table tr:hover {
+            background: var(--gray-100);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            gap: 0.25rem;
+        }
+
+        .status-open { background: #fff3cd; color: #856404; }
+        .status-inprogress { background: #cce5ff; color: #004085; }
+        .status-resolved { background: #d4edda; color: #155724; }
+        .status-invalid { background: #f8d7da; color: #721c24; }
+        .status-appreciated { background: #d1ecf1; color: #0c5460; }
+
+        /* Urgency Badges */
+        .urgency-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .urgency-low { background: #d4edda; color: #155724; }
+        .urgency-medium { background: #fff3cd; color: #856404; }
+        .urgency-high { background: #f8d7da; color: #721c24; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--gray-300);
+            border-radius: var(--border-radius-sm);
+            background: var(--card-bg);
+            color: var(--dark);
+            transition: var(--transition);
+            font-size: 0.875rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        /* Login Screen */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1rem;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: var(--shadow-xl);
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .slide-in {
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .header-actions {
+                gap: 0.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+            
+            .charts-container {
+                grid-template-columns: 1fr;
+                padding: 0 1rem 1rem;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+            
+            .login-card {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--light);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 20px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                    <i class="fas fa-school" style="font-size: 2rem; color: white;"></i>
+                </div>
+                <h1 style="font-size: 1.75rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem;">
+                    SchoolComplaint Pro
+                </h1>
+                <p style="color: var(--gray-600); font-size: 0.875rem;">
+                    Professional Complaint Management System
+                </p>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" id="loginEmail" class="form-control" placeholder="Enter your email">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Role</label>
+                <select id="loginRole" class="form-control">
+                    <option value="parent">Parent</option>
+                    <option value="principal">Principal</option>
+                    <option value="admin">Administrator</option>
+                </select>
+            </div>
+            
+            <button onclick="handleLogin()" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                <i class="fas fa-sign-in-alt"></i> Sign In
+            </button>
+            
+            <div id="loginError" style="display: none; background: #fef2f2; color: #dc2626; padding: 0.75rem; border-radius: var(--border-radius-sm); margin-top: 1rem; text-align: center;">
+                <i class="fas fa-exclamation-circle"></i> Invalid credentials
+            </div>
+            
+            <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-200);">
+                <small style="color: var(--gray-600);">
+                    <i class="fas fa-info-circle"></i> Demo: Use 'parent' or 'principal' as password
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="app" style="display: none;">
+        <div class="app-container">
+            <!-- Sidebar -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <a href="#" class="logo" onclick="showDashboard()">
+                        <div class="logo-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="logo-text">SchoolComplaint Pro</div>
+                    </a>
+                </div>
+                
+                <nav class="nav-menu">
+                    <ul>
+                        <li class="nav-item">
+                            <a href="#" onclick="showDashboard()" class="nav-link active" id="navDashboard">
+                                <i class="fas fa-home nav-icon"></i>
+                                <span class="nav-text">Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" onclick="showSubmitComplaint()" class="nav-link" id="navSubmit">
+                                <i class="fas fa-plus-circle nav-icon"></i>
+                                <span class="nav-text">New Complaint</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" onclick="showComplaints()" class="nav-link" id="navComplaints">
+                                <i class="fas fa-list-alt nav-icon"></i>
+                                <span class="nav-text">All Complaints</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" onclick="showAnalytics()" class="nav-link" id="navAnalytics">
+                                <i class="fas fa-chart-bar nav-icon"></i>
+                                <span class="nav-text">Analytics</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" onclick="showReports()" class="nav-link" id="navReports">
+                                <i class="fas fa-file-chart-line nav-icon"></i>
+                                <span class="nav-text">Reports</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" onclick="showSMSLogs()" class="nav-link" id="navSMS">
+                                <i class="fas fa-sms nav-icon"></i>
+                                <span class="nav-text">SMS Logs</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                
+                <div class="sidebar-footer">
+                    <div class="user-info">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                                <span id="userInitials">U</span>
+                            </div>
+                            <div>
+                                <div style="color: white; font-weight: 600;" id="userName">User</div>
+                                <div style="color: rgba(255,255,255,0.7); font-size: 0.75rem;" id="userRoleBadge">Role</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Header -->
+                <header class="header">
+                    <div class="header-left">
+                        <h1 id="pageTitle">Dashboard</h1>
+                        <p id="pageSubtitle">Welcome back! Here's what's happening today.</p>
+                    </div>
+                    
+                    <div class="header-actions">
+                        <div class="action-icon" onclick="toggleNotifications()" title="Notifications">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge" id="notificationCount" style="display: none;">3</span>
+                        </div>
+                        
+                        <div class="action-icon" onclick="toggleTheme()" title="Toggle Theme">
+                            <i class="fas fa-moon" id="themeIcon"></i>
+                        </div>
+                        
+                        <div class="action-icon" onclick="toggleSidebar()" title="Toggle Sidebar">
+                            <i class="fas fa-bars"></i>
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="showSubmitComplaint()" id="newComplaintBtn">
+                            <i class="fas fa-plus"></i> New Complaint
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Content Area -->
+                <div id="contentArea" class="fade-in">
+                    <!-- Dashboard will be loaded here -->
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal" id="complaintModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="font-size: 1.25rem; font-weight: 600;">Submit New Complaint</h3>
+                <button onclick="closeModal()" style="background: none; border: none; font-size: 1.5rem; color: var(--gray-600); cursor: pointer;">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="complaintForm" onsubmit="submitComplaint(event)">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Student Name *</label>
+                            <input type="text" class="form-control" id="studentName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Grade *</label>
+                            <select class="form-control" id="grade" required>
+                                <option value="">Select Grade</option>
+                                <option value="1">Grade 1</option>
+                                <option value="2">Grade 2</option>
+                                <option value="3">Grade 3</option>
+                                <option value="4">Grade 4</option>
+                                <option value="5">Grade 5</option>
+                                <option value="6">Grade 6</option>
+                                <option value="7">Grade 7</option>
+                                <option value="8">Grade 8</option>
+                                <option value="9">Grade 9</option>
+                                <option value="10">Grade 10</option>
+                                <option value="11">Grade 11</option>
+                                <option value="12">Grade 12</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Section *</label>
+                            <input type="text" class="form-control" id="section" placeholder="A, B, C, etc." required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Parent Name *</label>
+                            <input type="text" class="form-control" id="parentName" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Parent Mobile Number *</label>
+                        <input type="tel" class="form-control" id="parentMobile" pattern="[0-9]{10}" required placeholder="10-digit mobile number">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Complaint Category *</label>
+                        <select class="form-control" id="category" required onchange="updateSubcategories()">
+                            <option value="">Select Category</option>
+                            <option value="Academic Issues">Academic Issues</option>
+                            <option value="Teacher Behavior">Teacher Behavior</option>
+                            <option value="Student Safety">Student Safety & Discipline</option>
+                            <option value="School Management">School Management</option>
+                            <option value="Transport Issues">Transport Issues</option>
+                            <option value="Infrastructure">Infrastructure & Facilities</option>
+                            <option value="Food & Canteen">Food & Canteen</option>
+                            <option value="Digital Learning">Digital & Online Learning</option>
+                            <option value="Fees & Finance">Fees & Finance</option>
+                            <option value="Miscellaneous">Miscellaneous</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Specific Issue *</label>
+                        <select class="form-control" id="subcategory" required>
+                            <option value="">Select specific issue</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Description *</label>
+                        <textarea class="form-control" id="description" rows="4" required placeholder="Please describe your concern in detail..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Urgency Level *</label>
+                        <select class="form-control" id="urgency" required>
+                            <option value="low">Low Priority</option>
+                            <option value="medium">Medium Priority</option>
+                            <option value="high">High Priority - Immediate Action Required</option>
+                        </select>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">
+                            <i class="fas fa-paper-plane"></i> Submit Complaint
+                        </button>
+                        <button type="button" onclick="closeModal()" class="btn" style="flex: 1; background: var(--light); color: var(--dark);">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resolution Modal -->
+    <div class="modal" id="resolutionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="font-size: 1.25rem; font-weight: 600;">Update Complaint Status</h3>
+                <button onclick="closeResolutionModal()" style="background: none; border: none; font-size: 1.5rem; color: var(--gray-600); cursor: pointer;">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">New Status</label>
+                    <select class="form-control" id="resolutionStatus">
+                        <option value="open">Open</option>
+                        <option value="inprogress">In Progress</option>
+                        <option value="resolved">Resolved</option>
+                        <option value="invalid">Invalid</option>
+                        <option value="appreciated">Appreciated</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Principal's Remarks</label>
+                    <textarea class="form-control" id="resolutionRemarks" rows="4" placeholder="Enter detailed remarks about resolution..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Send Notification</label>
+                    <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" id="sendSMS" checked> SMS
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" id="sendEmail" checked> Email
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" id="sendWhatsApp"> WhatsApp
+                        </label>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button onclick="updateComplaintStatus()" class="btn btn-primary" style="flex: 1;">
+                        <i class="fas fa-check-circle"></i> Update Status
+                    </button>
+                    <button onclick="closeResolutionModal()" class="btn" style="flex: 1; background: var(--light); color: var(--dark);">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Professional Application Architecture
+        class ComplaintManagementSystem {
+            constructor() {
+                this.db = new LocalDatabase();
+                this.notifier = new NotificationService();
+                this.charts = new ChartManager();
+                this.currentUser = null;
+                this.currentView = 'dashboard';
+                this.init();
+            }
+
+            init() {
+                this.loadTheme();
+                this.setupEventListeners();
+                this.checkAuth();
+            }
+
+            loadTheme() {
+                const theme = localStorage.getItem('theme') || 'light';
+                document.documentElement.setAttribute('data-theme', theme);
+                document.getElementById('themeIcon').className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            }
+
+            setupEventListeners() {
+                // Auto-resize sidebar on mobile
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth <= 1024) {
+                        document.getElementById('sidebar').classList.remove('collapsed');
+                    }
+                });
+            }
+
+            checkAuth() {
+                const user = localStorage.getItem('currentUser');
+                if (user) {
+                    this.currentUser = JSON.parse(user);
+                    this.showApp();
+                }
+            }
+        }
+
+        class LocalDatabase {
+            constructor() {
+                this.initDB();
+            }
+
+            initDB() {
+                // Initialize all storage keys
+                const defaults = {
+                    complaints: this.getSampleComplaints(),
+                    users: this.getSampleUsers(),
+                    smsLogs: [],
+                    notifications: [],
+                    settings: {
+                        principalMobile: '+919876543210',
+                        schoolName: 'Global Public School',
+                        whatsappEnabled: true
+                    }
+                };
+
+                Object.entries(defaults).forEach(([key, value]) => {
+                    if (!localStorage.getItem(key)) {
+                        localStorage.setItem(key, JSON.stringify(value));
+                    }
+                });
+            }
+
+            getSampleComplaints() {
+                return [
+                    {
+                        id: 1,
+                        studentName: "Aarav Sharma",
+                        grade: "5",
+                        section: "A",
+                        parentName: "Rajesh Sharma",
+                        parentMobile: "9876543210",
+                        parentEmail: "rajesh@email.com",
+                        category: "Academic Issues",
+                        subcategory: "Excessive homework",
+                        description: "Student is receiving 4+ hours of homework daily which is affecting sleep and health.",
+                        urgency: "high",
+                        status: "open",
+                        date: "2024-01-15 10:30:00",
+                        principalRemarks: "",
+                        resolutionDate: null,
+                        assignedTo: "Principal",
+                        priority: 1
+                    },
+                    {
+                        id: 2,
+                        studentName: "Priya Patel",
+                        grade: "8",
+                        section: "B",
+                        parentName: "Sunita Patel",
+                        parentMobile: "9876543211",
+                        parentEmail: "sunita@email.com",
+                        category: "Teacher Behavior",
+                        subcategory: "Rude behavior",
+                        description: "Teacher regularly uses harsh language and shows favoritism towards certain students.",
+                        urgency: "medium",
+                        status: "inprogress",
+                        date: "2024-01-14 14:20:00",
+                        principalRemarks: "Meeting scheduled with teacher on Monday",
+                        resolutionDate: null,
+                        assignedTo: "Vice Principal",
+                        priority: 2
+                    },
+                    {
+                        id: 3,
+                        studentName: "Rohan Verma",
+                        grade: "6",
+                        section: "C",
+                        parentName: "Anil Verma",
+                        parentMobile: "9876543212",
+                        parentEmail: "anil@email.com",
+                        category: "Transport Issues",
+                        subcategory: "Late bus arrival",
+                        description: "School bus arrives 30-45 minutes late daily, causing student to miss first period.",
+                        urgency: "high",
+                        status: "resolved",
+                        date: "2024-01-10 08:15:00",
+                        principalRemarks: "Assigned new driver and adjusted route timing",
+                        resolutionDate: "2024-01-12 16:45:00",
+                        assignedTo: "Transport Manager",
+                        priority: 1
+                    },
+                    {
+                        id: 4,
+                        studentName: "Neha Gupta",
+                        grade: "9",
+                        section: "A",
+                        parentName: "Sanjay Gupta",
+                        parentMobile: "9876543213",
+                        parentEmail: "sanjay@email.com",
+                        category: "Infrastructure",
+                        subcategory: "Broken furniture",
+                        description: "Classroom desks are broken and pose safety hazard to students.",
+                        urgency: "medium",
+                        status: "open",
+                        date: "2024-01-13 11:45:00",
+                        principalRemarks: "",
+                        resolutionDate: null,
+                        assignedTo: "Maintenance",
+                        priority: 2
+                    },
+                    {
+                        id: 5,
+                        studentName: "Kabir Singh",
+                        grade: "4",
+                        section: "B",
+                        parentName: "Manpreet Singh",
+                        parentMobile: "9876543214",
+                        parentEmail: "manpreet@email.com",
+                        category: "Food & Canteen",
+                        subcategory: "Poor food quality",
+                        description: "Canteen food is often stale and lacks nutritional value.",
+                        urgency: "high",
+                        status: "inprogress",
+                        date: "2024-01-12 09:30:00",
+                        principalRemarks: "New caterer being evaluated",
+                        resolutionDate: null,
+                        assignedTo: "Administration",
+                        priority: 1
+                    }
+                ];
+            }
+
+            getSampleUsers() {
+                return [
+                    { id: 1, username: 'parent', password: 'parent', role: 'parent', name: 'John Parent', email: 'parent@school.com' },
+                    { id: 2, username: 'principal', password: 'principal', role: 'principal', name: 'Dr. Smith', email: 'principal@school.com' },
+                    { id: 3, username: 'admin', password: 'admin', role: 'admin', name: 'Admin User', email: 'admin@school.com' }
+                ];
+            }
+
+            getComplaints() {
+                return JSON.parse(localStorage.getItem('complaints')) || [];
+            }
+
+            addComplaint(complaint) {
+                const complaints = this.getComplaints();
+                complaint.id = complaints.length > 0 ? Math.max(...complaints.map(c => c.id)) + 1 : 1;
+                complaint.date = new Date().toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                }).replace(',', '');
+                complaint.status = 'open';
+                complaint.principalRemarks = '';
+                complaint.resolutionDate = null;
+                complaint.priority = complaint.urgency === 'high' ? 1 : complaint.urgency === 'medium' ? 2 : 3;
+                
+                complaints.push(complaint);
+                localStorage.setItem('complaints', JSON.stringify(complaints));
+                return complaint;
+            }
+
+            updateComplaint(id, updates) {
+                const complaints = this.getComplaints();
+                const index = complaints.findIndex(c => c.id === id);
+                if (index !== -1) {
+                    if (updates.status === 'resolved' || updates.status === 'invalid' || updates.status === 'appreciated') {
+                        updates.resolutionDate = new Date().toLocaleString('en-US', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        }).replace(',', '');
+                    }
+                    complaints[index] = { ...complaints[index], ...updates };
+                    localStorage.setItem('complaints', JSON.stringify(complaints));
+                    return true;
+                }
+                return false;
+            }
+
+            getStats() {
+                const complaints = this.getComplaints();
+                const stats = {
+                    total: complaints.length,
+                    open: complaints.filter(c => c.status === 'open').length,
+                    inProgress: complaints.filter(c => c.status === 'inprogress').length,
+                    resolved: complaints.filter(c => c.status === 'resolved').length,
+                    highPriority: complaints.filter(c => c.urgency === 'high').length,
+                    byCategory: {},
+                    byGrade: {},
+                    byStatus: {},
+                    byMonth: {}
+                };
+
+                complaints.forEach(complaint => {
+                    stats.byCategory[complaint.category] = (stats.byCategory[complaint.category] || 0) + 1;
+                    stats.byGrade[complaint.grade] = (stats.byGrade[complaint.grade] || 0) + 1;
+                    stats.byStatus[complaint.status] = (stats.byStatus[complaint.status] || 0) + 1;
+                    
+                    const month = complaint.date.substring(0, 7);
+                    stats.byMonth[month] = (stats.byMonth[month] || 0) + 1;
+                });
+
+                return stats;
+            }
+        }
+
+        class NotificationService {
+            sendSMS(to, message) {
+                console.log(`SMS to ${to}: ${message}`);
+                const logs = JSON.parse(localStorage.getItem('smsLogs')) || [];
+                logs.push({
+                    to,
+                    message,
+                    timestamp: new Date().toISOString(),
+                    status: 'sent'
+                });
+                localStorage.setItem('smsLogs', JSON.stringify(logs));
+                return true;
+            }
+
+            sendNewComplaintAlert(complaint) {
+                const settings = JSON.parse(localStorage.getItem('settings'));
+                const message = `🚨 NEW COMPLAINT\nStudent: ${complaint.studentName}\nGrade: ${complaint.grade}\nParent: ${complaint.parentName}\nCategory: ${complaint.category}\nUrgency: ${complaint.urgency.toUpperCase()}\nID: #${complaint.id}`;
+                
+                this.sendSMS(settings.principalMobile, message);
+            }
+
+            sendStatusUpdate(complaint, newStatus, remarks) {
+                let message = '';
+                
+                switch(newStatus) {
+                    case 'resolved':
+                        message = `✅ COMPLAINT RESOLVED\nDear ${complaint.parentName}, your complaint #${complaint.id} has been resolved.\nRemarks: ${remarks}`;
+                        break;
+                    case 'inprogress':
+                        message = `🔄 COMPLAINT IN PROGRESS\nDear ${complaint.parentName}, we're working on your complaint #${complaint.id}.\nThank you for your patience.`;
+                        break;
+                    case 'appreciated':
+                        message = `🌟 THANK YOU\nDear ${complaint.parentName}, thank you for your valuable feedback regarding ${complaint.studentName}.`;
+                        break;
+                }
+                
+                if (message) {
+                    this.sendSMS(complaint.parentMobile, message);
+                }
+            }
+        }
+
+        class ChartManager {
+            renderDashboardCharts(stats) {
+                this.renderCategoryChart(stats.byCategory);
+                this.renderStatusChart(stats.byStatus);
+                this.renderMonthlyTrend(stats.byMonth);
+            }
+
+            renderCategoryChart(data) {
+                const ctx = document.getElementById('categoryChart');
+                if (!ctx) return;
+                
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(data),
+                        datasets: [{
+                            data: Object.values(data),
+                            backgroundColor: [
+                                '#4361ee', '#7209b7', '#f72585', '#4cc9f0',
+                                '#4895ef', '#560bad', '#b5179e', '#f8961e'
+                            ],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    padding: 20,
+                                    usePointStyle: true
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            renderStatusChart(data) {
+                const ctx = document.getElementById('statusChart');
+                if (!ctx) return;
+                
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(data).map(s => s.charAt(0).toUpperCase() + s.slice(1)),
+                        datasets: [{
+                            data: Object.values(data),
+                            backgroundColor: [
+                                '#4361ee', '#f8961e', '#4cc9f0', '#f94144', '#2ec4b6'
+                            ],
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    display: false
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            renderMonthlyTrend(data) {
+                const ctx = document.getElementById('monthlyChart');
+                if (!ctx) return;
+                
+                const months = Object.keys(data).sort();
+                const values = months.map(m => data[m]);
+                
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            label: 'Complaints',
+                            data: values,
+                            borderColor: '#4361ee',
+                            backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#4361ee',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    borderDash: [5, 5]
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Initialize Application
+        const app = new ComplaintManagementSystem();
+        const db = new LocalDatabase();
+        const notifier = new NotificationService();
+        const charts = new ChartManager();
+
+        // UI Functions
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const role = document.getElementById('loginRole').value;
+            
+            // Simple validation for demo
+            if (password === role) {
+                const user = {
+                    email,
+                    role,
+                    name: role === 'parent' ? 'John Parent' : role === 'principal' ? 'Dr. Smith' : 'Admin User'
+                };
+                
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                app.currentUser = user;
+                showApp();
+            } else {
+                document.getElementById('loginError').style.display = 'block';
+            }
+        }
+
+        function showApp() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            
+            const user = app.currentUser;
+            document.getElementById('userName').textContent = user.name;
+            document.getElementById('userRoleBadge').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+            document.getElementById('userInitials').textContent = user.name.split(' ').map(n => n[0]).join('');
+            
+            // Show/hide features based on role
+            if (user.role !== 'principal') {
+                document.getElementById('navAnalytics').parentElement.style.display = 'none';
+                document.getElementById('navReports').parentElement.style.display = 'none';
+                document.getElementById('navSMS').parentElement.style.display = 'none';
+            }
+            
+            showDashboard();
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            location.reload();
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            document.getElementById('themeIcon').className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            localStorage.setItem('theme', newTheme);
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            if (window.innerWidth <= 1024) {
+                sidebar.classList.toggle('active');
+            } else {
+                sidebar.classList.toggle('collapsed');
+            }
+        }
+
+        function setActiveNav(navId) {
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            document.getElementById(navId).classList.add('active');
+        }
+
+        // View Functions
+        function showDashboard() {
+            setActiveNav('navDashboard');
+            document.getElementById('pageTitle').textContent = 'Dashboard';
+            document.getElementById('pageSubtitle').textContent = 'Complaint Overview & Analytics';
+            
+            const stats = db.getStats();
+            const complaints = db.getComplaints().slice(-5).reverse();
+            
+            const content = `
+                <div class="dashboard-grid">
+                    <div class="card stat-card stat-1">
+                        <div class="stat-icon">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>${stats.total}</h3>
+                            <p>Total Complaints</p>
+                            <small>+12% from last month</small>
+                        </div>
+                    </div>
+                    
+                    <div class="card stat-card stat-2">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>${stats.open}</h3>
+                            <p>Open Complaints</p>
+                            <small>${stats.highPriority} high priority</small>
+                        </div>
+                    </div>
+                    
+                    <div class="card stat-card stat-3">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>${stats.resolved}</h3>
+                            <p>Resolved</p>
+                            <small>92% satisfaction rate</small>
+                        </div>
+                    </div>
+                    
+                    <div class="card stat-card stat-4">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>${stats.inProgress}</h3>
+                            <p>In Progress</p>
+                            <small>Average resolution: 3.2 days</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="charts-container">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Complaints by Category</div>
+                            <select class="form-control" style="width: 150px;">
+                                <option>Last 30 days</option>
+                                <option>Last 90 days</option>
+                                <option>This year</option>
+                            </select>
+                        </div>
+                        <div style="height: 300px;">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Monthly Trend</div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <div style="display: flex; align-items: center; gap: 0.25rem;">
+                                    <div style="width: 12px; height: 12px; background: #4361ee; border-radius: 2px;"></div>
+                                    <small>2024</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="height: 300px;">
+                            <canvas id="monthlyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="padding: 0 2rem 2rem;">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Recent Complaints</div>
+                            <button onclick="showComplaints()" class="btn btn-outline" style="font-size: 0.875rem;">
+                                View All <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        <div class="table-container">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Student</th>
+                                            <th>Grade</th>
+                                            <th>Category</th>
+                                            <th>Urgency</th>
+                                            <th>Status</th>
+                                            <th>Date</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${complaints.map(c => `
+                                            <tr>
+                                                <td><strong>#${c.id}</strong></td>
+                                                <td>${c.studentName}</td>
+                                                <td>${c.grade}</td>
+                                                <td>${c.category}</td>
+                                                <td><span class="urgency-badge urgency-${c.urgency}">${c.urgency.toUpperCase()}</span></td>
+                                                <td><span class="status-badge status-${c.status}">${c.status.toUpperCase()}</span></td>
+                                                <td>${c.date.split(' ')[0]}</td>
+                                                <td>
+                                                    <button onclick="viewComplaint(${c.id})" class="action-icon" style="width: 32px; height: 32px; font-size: 0.875rem;">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    ${app.currentUser.role === 'principal' ? `
+                                                    <button onclick="openResolutionModal(${c.id})" class="action-icon" style="width: 32px; height: 32px; font-size: 0.875rem; background: var(--primary); color: white;">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    ` : ''}
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('contentArea').innerHTML = content;
+            
+            // Render charts after content is loaded
+            setTimeout(() => {
+                charts.renderDashboardCharts(stats);
+            }, 100);
+        }
+
+        function showSubmitComplaint() {
+            document.getElementById('complaintModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('complaintModal').classList.remove('active');
+        }
+
+        function updateSubcategories() {
+            const category = document.getElementById('category').value;
+            const subcategorySelect = document.getElementById('subcategory');
+            subcategorySelect.innerHTML = '<option value="">Select specific issue</option>';
+            
+            const subcategories = {
+                'Academic Issues': ['Poor teaching quality', 'Incomplete syllabus', 'Excessive homework', 'Unfair grading', 'Teacher absenteeism'],
+                'Teacher Behavior': ['Rude behavior', 'Discrimination', 'Lack of communication', 'Favoritism'],
+                'Student Safety': ['Bullying', 'Physical punishment', 'Unsafe environment', 'Lack of supervision'],
+                'School Management': ['Poor communication', 'Unresponsive administration', 'Mismanagement'],
+                'Transport Issues': ['Late bus', 'Unsafe driving', 'Overcrowding', 'Route problems'],
+                'Infrastructure': ['Dirty classrooms', 'Poor hygiene', 'Broken furniture', 'No drinking water'],
+                'Food & Canteen': ['Poor quality', 'Unhygienic', 'Overpriced', 'Limited options'],
+                'Digital Learning': ['Portal issues', 'No online support', 'Technical problems'],
+                'Fees & Finance': ['Incorrect charges', 'Refund delays', 'Lack of transparency'],
+                'Miscellaneous': ['Other concerns']
+            };
+            
+            if (subcategories[category]) {
+                subcategories[category].forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub;
+                    option.textContent = sub;
+                    subcategorySelect.appendChild(option);
+                });
+            }
+        }
+
+        function submitComplaint(event) {
+            event.preventDefault();
+            
+            const complaint = {
+                studentName: document.getElementById('studentName').value,
+                grade: document.getElementById('grade').value,
+                section: document.getElementById('section').value,
+                parentName: document.getElementById('parentName').value,
+                parentMobile: document.getElementById('parentMobile').value,
+                parentEmail: app.currentUser.email,
+                category: document.getElementById('category').value,
+                subcategory: document.getElementById('subcategory').value,
+                description: document.getElementById('description').value,
+                urgency: document.getElementById('urgency').value
+            };
+            
+            const saved = db.addComplaint(complaint);
+            notifier.sendNewComplaintAlert(saved);
+            
+            // Show success message
+            alert('✅ Complaint submitted successfully! Principal has been notified.');
+            closeModal();
+            showDashboard();
+        }
+
+        function showComplaints() {
+            setActiveNav('navComplaints');
+            document.getElementById('pageTitle').textContent = 'All Complaints';
+            document.getElementById('pageSubtitle').textContent = 'View and manage complaints';
+            
+            const complaints = db.getComplaints().reverse();
+            
+            const content = `
+                <div style="padding: 2rem;">
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div class="card-title">Complaint History</div>
+                            <div style="display: flex; gap: 1rem;">
+                                <input type="text" class="form-control" placeholder="Search complaints..." style="width: 200px;" onkeyup="filterComplaints()">
+                                <select class="form-control" style="width: 150px;" onchange="filterComplaints()">
+                                    <option value="">All Status</option>
+                                    <option value="open">Open</option>
+                                    <option value="inprogress">In Progress</option>
+                                    <option value="resolved">Resolved</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="table-container">
+                            <div class="table-responsive">
+                                <table class="table" id="complaintsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Student</th>
+                                            <th>Grade</th>
+                                            <th>Parent</th>
+                                            <th>Category</th>
+                                            <th>Urgency</th>
+                                            <th>Status</th>
+                                            <th>Date</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${complaints.map(c => `
+                                            <tr>
+                                                <td><strong>#${c.id}</strong></td>
+                                                <td>${c.studentName}</td>
+                                                <td>${c.grade}</td>
+                                                <td>${c.parentName}</td>
+                                                <td>${c.category}</td>
+                                                <td><span class="urgency-badge urgency-${c.urgency}">${c.urgency.toUpperCase()}</span></td>
+                                                <td><span class="status-badge status-${c.status}">${c.status.toUpperCase()}</span></td>
+                                                <td>${c.date.split(' ')[0]}</td>
+                                                <td>
+                                                    <button onclick="viewComplaint(${c.id})" class="action-icon" style="width: 32px; height: 32px; font-size: 0.875rem; margin-right: 0.5rem;">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    ${app.currentUser.role === 'principal' ? `
+                                                    <button onclick="openResolutionModal(${c.id})" class="action-icon" style="width: 32px; height: 32px; font-size: 0.875rem; background: var(--primary); color: white;">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    ` : ''}
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('contentArea').innerHTML = content;
+        }
+
+        function viewComplaint(id) {
+            const complaint = db.getComplaints().find(c => c.id === id);
+            if (!complaint) return;
+            
+            const content = `
+                <div class="modal active" id="viewModal">
+                    <div class="modal-content" style="max-width: 600px;">
+                        <div class="modal-header">
+                            <h3 style="font-size: 1.25rem; font-weight: 600;">Complaint #${complaint.id}</h3>
+                            <button onclick="closeViewModal()" style="background: none; border: none; font-size: 1.5rem; color: var(--gray-600); cursor: pointer;">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div style="display: grid; gap: 1rem;">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                    <div>
+                                        <label style="font-weight: 600; color: var(--gray-600); font-size: 0.875rem;">Student Name</label>
+                                        <div style="font-size: 1rem; margin-top: 0.25rem;">${complaint.studentName}</div>
+                                    </div>
+                                    <div>
+                                        <label style="font-weight: 600; color: var(--gray-600); font-size: 0.875rem;">Grade/Section</label>
+                                        <div style="font-size: 1rem; margin-top: 0.25rem;">Grade ${complaint.grade} - ${complaint.section}</div>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label style="font-weight: 600; color: var(--gray-600); font-size: 0.875rem;">Parent Information</label>
+                                    <div style="font-size: 1rem; margin-top: 0.25rem;">${complaint.parentName} • ${complaint.parentMobile}</div>
+                                </div>
+                                
+                                <div>
+                                    <label style="font-weight: 600; color: var(--gray-600); font-size: 0.875rem;">Category & Issue</label>
+                                    <div style="font-size: 1rem; margin-top: 0.25rem;">${complaint.category} • ${complaint.subcategory}</div>
+                                </div>
+                                
+                                <div>
+                                    <label style="font-weight: 600; color: var(--gray-600); font-size: 0.875rem;">Description</label>
+                                    <div style="background: var(--light); padding: 1rem; border-radius: var(--border-radius-sm); margin-top: 0.5rem;">
+                                        ${complaint.description}
+                                    </div>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                    <div>
+                                        <label style="font-weight: 600; color: var(--gray-600); font-size: 0.875rem;">Urgency</label>
+                                        <div style="margin-top: 0.25rem;"><span class="urgency-badge urgency-${complaint.urgency}">${complaint.urgency.toUpperCase()}</span></div>
+                                    </div>
+                                    <div>
+                                        <label style="font-weight: 600; color: var(--gray-600); font-size: 0.875rem;">Status</label>
+                                        <div style="margin-top: 0.25rem;"><span class="status-badge status-${complaint.status}">${complaint.status.toUpperCase()}</span></div>
+                                    </div>
+                                </div>
+                                
+                                ${complaint.principalRemarks ? `
+                                <div>
+                                    <label style="font-weight: 600; color: var(--gray-600); font-size: 0.875rem;">Principal's Remarks</label>
+                                    <div style="background: rgba(67, 97, 238, 0.1); padding: 1rem; border-radius: var(--border-radius-sm); margin-top: 0.5rem; color: var(--primary);">
+                                        ${complaint.principalRemarks}
+                                    </div>
+                                </div>
+                                ` : ''}
+                                
+                                ${complaint.resolutionDate ? `
+                                <div>
+                                    <label style="font-weight: 600; color: var(--gray-600); font-size: 0.875rem;">Resolved On</label>
+                                    <div style="font-size: 1rem; margin-top: 0.25rem;">${complaint.resolutionDate}</div>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Create modal
+            const modal = document.createElement('div');
+            modal.innerHTML = content;
+            document.body.appendChild(modal);
+        }
+
+        function closeViewModal() {
+            const modal = document.getElementById('viewModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        function openResolutionModal(id) {
+            const complaint = db.getComplaints().find(c => c.id === id);
+            if (!complaint) return;
+            
+            // Store current complaint ID
+            window.currentResolutionId = id;
+            
+            // Pre-fill form
+            document.getElementById('resolutionStatus').value = complaint.status;
+            document.getElementById('resolutionRemarks').value = complaint.principalRemarks || '';
+            
+            document.getElementById('resolutionModal').classList.add('active');
+        }
+
+        function closeResolutionModal() {
+            document.getElementById('resolutionModal').classList.remove('active');
+            window.currentResolutionId = null;
+        }
+
+        function updateComplaintStatus() {
+            const id = window.currentResolutionId;
+            if (!id) return;
+            
+            const status = document.getElementById('resolutionStatus').value;
+            const remarks = document.getElementById('resolutionRemarks').value;
+            
+            const complaint = db.getComplaints().find(c => c.id === id);
+            
+            db.updateComplaint(id, {
+                status: status,
+                principalRemarks: remarks
+            });
+            
+            // Send notification if status changed
+            if (status !== complaint.status) {
+                notifier.sendStatusUpdate(complaint, status, remarks);
+            }
+            
+            alert('✅ Status updated successfully!');
+            closeResolutionModal();
+            showDashboard();
+        }
+
+        function showAnalytics() {
+            setActiveNav('navAnalytics');
+            document.getElementById('pageTitle').textContent = 'Analytics';
+            document.getElementById('pageSubtitle').textContent = 'Detailed insights and reports';
+            
+            const stats = db.getStats();
+            
+            const content = `
+                <div style="padding: 2rem;">
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div class="card-header">
+                            <div class="card-title">Complaint Analytics Dashboard</div>
+                            <select class="form-control" style="width: 180px;">
+                                <option>Last 30 Days</option>
+                                <option>Last Quarter</option>
+                                <option>Year to Date</option>
+                            </select>
+                        </div>
+                        <div style="padding: 1.5rem;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 2rem; font-weight: 700; color: var(--primary);">${Math.round(stats.resolved / stats.total * 100)}%</div>
+                                    <div style="color: var(--gray-600); font-size: 0.875rem;">Resolution Rate</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 2rem; font-weight: 700; color: var(--success);">${stats.highPriority}</div>
+                                    <div style="color: var(--gray-600); font-size: 0.875rem;">High Priority Cases</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 2rem; font-weight: 700; color: var(--warning);">3.2</div>
+                                    <div style="color: var(--gray-600); font-size: 0.875rem;">Avg. Resolution Days</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 2rem; font-weight: 700; color: var(--info);">92%</div>
+                                    <div style="color: var(--gray-600); font-size: 0.875rem;">Satisfaction Rate</div>
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                                <div>
+                                    <h4 style="margin-bottom: 1rem; font-size: 1rem; font-weight: 600;">Status Distribution</h4>
+                                    <div style="height: 250px;">
+                                        <canvas id="statusChart"></canvas>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 style="margin-bottom: 1rem; font-size: 1rem; font-weight: 600;">Grade-wise Complaints</h4>
+                                    <div style="height: 250px;">
+                                        <canvas id="gradeChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('contentArea').innerHTML = content;
+            
+            // Render analytics charts
+            setTimeout(() => {
+                charts.renderStatusChart(stats.byStatus);
+                
+                // Grade chart
+                const gradeCtx = document.getElementById('gradeChart');
+                if (gradeCtx) {
+                    new Chart(gradeCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: Object.keys(stats.byGrade).sort((a, b) => a - b).map(g => `Grade ${g}`),
+                            datasets: [{
+                                data: Object.keys(stats.byGrade).sort((a, b) => a - b).map(g => stats.byGrade[g]),
+                                backgroundColor: '#4361ee',
+                                borderRadius: 6
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        display: false
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        display: false
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }, 100);
+        }
+
+        function showReports() {
+            setActiveNav('navReports');
+            document.getElementById('pageTitle').textContent = 'Reports';
+            document.getElementById('pageSubtitle').textContent = 'Generate and export reports';
+            
+            const content = `
+                <div style="padding: 2rem;">
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div class="card-header">
+                            <div class="card-title">Report Generator</div>
+                        </div>
+                        <div style="padding: 1.5rem;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                                <div class="card" style="text-align: center; cursor: pointer;" onclick="generateReport('daily')">
+                                    <div style="font-size: 2rem; color: var(--primary); margin-bottom: 0.5rem;">
+                                        <i class="fas fa-calendar-day"></i>
+                                    </div>
+                                    <h4 style="margin-bottom: 0.5rem;">Daily Report</h4>
+                                    <p style="color: var(--gray-600); font-size: 0.875rem;">Today's complaints summary</p>
+                                </div>
+                                
+                                <div class="card" style="text-align: center; cursor: pointer;" onclick="generateReport('weekly')">
+                                    <div style="font-size: 2rem; color: var(--success); margin-bottom: 0.5rem;">
+                                        <i class="fas fa-calendar-week"></i>
+                                    </div>
+                                    <h4 style="margin-bottom: 0.5rem;">Weekly Report</h4>
+                                    <p style="color: var(--gray-600); font-size: 0.875rem;">Last 7 days analysis</p>
+                                </div>
+                                
+                                <div class="card" style="text-align: center; cursor: pointer;" onclick="generateReport('monthly')">
+                                    <div style="font-size: 2rem; color: var(--warning); margin-bottom: 0.5rem;">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </div>
+                                    <h4 style="margin-bottom: 0.5rem;">Monthly Report</h4>
+                                    <p style="color: var(--gray-600); font-size: 0.875rem;">Complete monthly analysis</p>
+                                </div>
+                                
+                                <div class="card" style="text-align: center; cursor: pointer;" onclick="generateReport('custom')">
+                                    <div style="font-size: 2rem; color: var(--danger); margin-bottom: 0.5rem;">
+                                        <i class="fas fa-chart-pie"></i>
+                                    </div>
+                                    <h4 style="margin-bottom: 0.5rem;">Custom Report</h4>
+                                    <p style="color: var(--gray-600); font-size: 0.875rem;">Filter by date, category, status</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('contentArea').innerHTML = content;
+        }
+
+        function showSMSLogs() {
+            setActiveNav('navSMS');
+            document.getElementById('pageTitle').textContent = 'SMS Logs';
+            document.getElementById('pageSubtitle').textContent = 'Message delivery history';
+            
+            const logs = JSON.parse(localStorage.getItem('smsLogs')) || [];
+            
+            const content = `
+                <div style="padding: 2rem;">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">SMS Notification Logs</div>
+                            <div style="display: flex; gap: 1rem;">
+                                <select class="form-control" style="width: 150px;">
+                                    <option>All Messages</option>
+                                    <option>Today</option>
+                                    <option>Last 7 Days</option>
+                                </select>
+                                <button class="btn btn-primary" onclick="exportLogs()">
+                                    <i class="fas fa-download"></i> Export
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Timestamp</th>
+                                            <th>Recipient</th>
+                                            <th>Type</th>
+                                            <th>Message Preview</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${logs.slice().reverse().map(log => `
+                                            <tr>
+                                                <td>${new Date(log.timestamp).toLocaleString()}</td>
+                                                <td>${log.to}</td>
+                                                <td>${log.message.includes('NEW COMPLAINT') ? 'Alert' : 'Update'}</td>
+                                                <td style="max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${log.message}</td>
+                                                <td><span class="status-badge status-resolved">${log.status}</span></td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('contentArea').innerHTML = content;
+        }
+
+        function filterComplaints() {
+            // Implementation for filtering complaints
+            console.log('Filtering complaints...');
+        }
+
+        function generateReport(type) {
+            alert(`Generating ${type} report...\nThis would export a PDF/Excel file in production.`);
+        }
+
+        function exportLogs() {
+            alert('Exporting SMS logs to CSV...');
+        }
+
+        function toggleNotifications() {
+            alert('Notifications panel would open here');
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set demo email
+            document.getElementById('loginEmail').value = 'user@school.com';
+        });
+    </script>
+</body>
+</html>
